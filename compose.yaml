@@ -1,0 +1,61 @@
+name: mira
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: mira
+      POSTGRES_USER: mira
+      POSTGRES_PASSWORD: mira
+    volumes:
+      - mira-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mira -d mira"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  reconstruction-worker:
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    image: mira-reconstruction-worker:1.1.5
+    ports:
+      - "127.0.0.1:8787:8787"
+    gpus: all
+    shm_size: "4gb"
+    environment:
+      MIRA_DATA_ROOT: /data
+      MIRA_TRAIN_STEPS: "10000"
+      MIRA_QUICK_TRAIN_STEPS: "2500"
+      MIRA_PREVIEW_TRAIN_STEPS: "4000"
+      MIRA_BALANCED_TRAIN_STEPS: "6500"
+      MIRA_MAXIMUM_TRAIN_STEPS: "15000"
+      MIRA_METRICS_POLL_SECONDS: "5"
+      MIRA_TRAIN_LOG_SAMPLES: "100"
+      MIRA_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      MIRA_GATEWAY_TOKEN: ${RECONSTRUCTION_WORKER_TOKEN:-}
+      TORCH_CUDA_ARCH_LIST: "8.6"
+    volumes:
+      - mira-reconstruction-data:/data
+      - mira-model-cache:/root/.cache
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8787/health', timeout=3).read()"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mira-postgres-data:
+  mira-reconstruction-data:
+  mira-model-cache:

@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-server
+.env
+.env.local
+uploads/
+storage/
+worker/beta-dist/
+*.log
+.DS_Store
+artifacts/
+test-results/
+playwright-report/
+__pycache__/
+reconstruction-data/

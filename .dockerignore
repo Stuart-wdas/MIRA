@@ -1,0 +1,16 @@
+node_modules
+dist
+artifacts
+test-results
+playwright-report
+reconstruction-data
+storage
+uploads
+recovery-backups
+dist-server
+worker/beta-dist
+.git
+.env*
+*.log
+**/__pycache__
+**/*.pyc
