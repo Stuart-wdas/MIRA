@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Mira Lab — Live splat beta</title></head>
+  <body>
+    <header><a class="brand" href="/beta/">MIRA <span>LAB</span></a><span class="beta">LIVE SPLAT BETA</span><span class="connection" id="connection">Not connected</span></header>
+    <main>
+      <aside>
+        <h1>Watch a space take shape.</h1><p class="intro">Your local GPU, an evolving scene, and a front-row seat.</p>
+        <section>
+          <h2><span>01</span> Connect to your worker</h2>
+          <label>Worker token <input id="token" type="password" autocomplete="off" placeholder="Token from your local .env" /></label>
+          <p class="hint">Kept only in this tab's memory. Leave empty if your worker has no token.</p>
+          <button id="connect">Connect & load jobs</button>
+          <label>Existing job <select id="jobs"><option value="">Choose a job</option></select></label>
+          <div class="join"><input id="job-id" aria-label="Job ID" placeholder="Or paste a job ID" /><button id="watch">Watch</button></div>
+        </section>
+        <section>
+          <h2><span>02</span> Start a new build</h2>
+          <form id="upload">
+            <label>Walkthrough video<input id="video" type="file" accept=".mp4,.mov,.m4v,.webm" required /></label>
+            <label>Space name or order ID<input id="name" maxlength="80" placeholder="e.g. Kloof Street apartment" required /></label>
+            <label>Quality<select id="quality"><option value="quick">Quick</option><option value="preview">Preview</option><option value="balanced" selected>Balanced</option><option value="high">High</option><option value="maximum">Maximum</option></select></label>
+            <label class="check"><input id="custom" type="checkbox" /> Custom tuning (Maximum)</label>
+            <div id="tuning" hidden>
+              <label>Sampled frames<input id="frames" type="number" min="60" max="1200" value="400" /></label>
+              <label>Training steps<input id="steps" type="number" min="1000" max="15000" value="15000" /></label>
+              <label>Downscale<select id="downscale"><option value="1">1×</option><option value="2">2×</option><option value="4" selected>4×</option><option value="8">8×</option></select></label>
+            </div>
+            <button id="start" class="primary" disabled>Build with live preview</button>
+          </form>
+          <p class="hint">Creates a local GPU job. Download the final PLY and upload it to the customer's order separately.</p>
+        </section>
+        <section class="local-file"><label>Or explore a finished splat<input id="local" type="file" accept=".ply,.splat,.ksplat,.spz,.sog" /></label></section>
+      </aside>
+      <div class="workspace">
+        <div class="scene-heading"><div><span class="eyebrow">LIVE WORKSPACE</span><h2 id="scene-name">Your next perspective</h2><p id="job-label">Choose a job or upload a video to begin.</p></div><span id="status" class="status">Standby</span></div>
+        <div class="viewport" id="viewport">
+          <div class="empty" id="empty"><span class="orb"></span><h3 id="empty-title">A space in the making</h3><p id="empty-copy">Move around the scene as the splats evolve. The first snapshot appears when training starts, after camera matching.</p></div>
+          <div class="scene-toolbar"><button id="reset">Reset view</button><label class="check"><input id="follow" type="checkbox" checked /> Live updates</label></div>
+          <div id="scene-notice" class="scene-notice" aria-live="polite">Orbit: drag · Pan: right-drag · Zoom: scroll</div>
+        </div>
+        <div id="error" class="error" role="alert" hidden></div>
+        <div class="progress-heading"><strong id="stage">Waiting for a job</strong><span id="progress-label">0%</span></div><progress id="progress" max="100" value="0"></progress>
+        <div class="metrics"><article><span>Training step</span><strong id="iteration">—</strong></article><article><span>Gaussians</span><strong id="gaussians">—</strong></article><article><span>PSNR</span><strong id="psnr">—</strong></article><article><span>Elapsed</span><strong id="elapsed">—</strong></article></div>
+        <footer><p id="snapshot">Previews refresh at most every 15 seconds, at 250-step intervals. Large scenes are sampled to 200,000 splats with basic colour; the final export retains full detail.</p><button id="final" disabled>Load final model</button><button id="download" disabled>Download final PLY</button></footer>
+      </div>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
